@@ -1,4 +1,7 @@
 import MarkdownIt from "markdown-it";
+import { useLocation } from "preact-iso";
+import { knowledgeRequest, libraryPath, type KnowledgeLibrary } from "../api/knowledge";
+import { answerToKnowledgeChange, citedKnowledgeSources, createChatNavigationGuard, KnowledgeChatError, prepareKnowledgeContext, type PreparedKnowledgeContext } from "../knowledgeChat";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { signal, computed } from "@preact/signals";
 import {
@@ -10,7 +13,7 @@ import {
 import type {
   ModelInfo, ChatMessage, ContentPart, CloudAuthStatus,
   ConversationMeta, Conversation,
-  ChatMessageMeta, WebSearchResult, DecisionQuestionType,
+  ChatMessageMeta, WebSearchResult, DecisionQuestionType, KnowledgeChatSelection, KnowledgeChatSnapshot,
 } from "../api/client";
 import { t, locale } from "../i18n";
 import { RealtimeVoiceDialog } from "../components/RealtimeVoiceDialog";
@@ -37,7 +40,7 @@ const activeSessionId = signal("");
 const inputText = signal("");
 const isGenerating = signal(false);
 const showSettings = signal(false);
-const showSidebar = signal(true);
+const showSidebar = signal(window.innerWidth >= 1100);
 const showCloudAuthDialog = signal(false);
 const openConversationMenuId = signal("");
 const cloudAuth = signal<CloudAuthStatus | null>(null);
@@ -877,9 +880,12 @@ function syncModelSelectionToConversation(conv: Conversation) {
   }
 }
 
-async function loadConversation(id: string) {
+const conversationNavigation = createChatNavigationGuard();
+async function loadConversation(id: string, isMounted: () => boolean) {
+  const isCurrent = conversationNavigation.begin();
   try {
     const conv = await getConversation(id);
+    if (!isCurrent() || !isMounted()) return;
     activeConversation.value = conv;
     activeSessionId.value = conv.id;
     syncModelSelectionToConversation(conv);
@@ -948,6 +954,19 @@ function formatElapsedWait(ms: number): string {
 }
 
 export function Chat() {
+  const { query: routeQuery, route } = useLocation();
+  const [conversationReady, setConversationReady] = useState(false);
+  const [knowledgeLibrary, setKnowledgeLibrary] = useState<KnowledgeLibrary | null>(null);
+  const [knowledgePreview, setKnowledgePreview] = useState<PreparedKnowledgeContext | null>(null);
+  const [knowledgePreviewError, setKnowledgePreviewError] = useState("");
+  const [knowledgePreparing, setKnowledgePreparing] = useState(false);
+  const [knowledgeDetaching, setKnowledgeDetaching] = useState(false);
+  const knowledgeReadRef = useRef<AbortController | null>(null);
+  const initializedConversationRef = useRef(false);
+  const mountedRef = useRef(true);
+  const incomingLibrary = routeQuery.knowledge || "";
+  const incomingPage = routeQuery.page || "";
+
   const messagesRef = useRef<HTMLDivElement>(null);
   const stickToBottomRef = useRef(true);
   const abortRef = useRef<AbortController | null>(null);
@@ -976,6 +995,7 @@ export function Chat() {
   };
 
   const handleModelChange = (nextKey: string) => {
+    if (knowledgeReadRef.current || knowledgePreparing) return;
     const conv = activeConversation.value;
     if (conv && conv.messages.length > 0 && conv.model !== nextKey) {
       setModelContextBoundary(conv.id, nextKey, conv.messages.length);
@@ -998,6 +1018,8 @@ export function Chat() {
   };
 
   useEffect(() => {
+    mountedRef.current = true;
+    conversationNavigation.invalidate();
     const refreshModels = () => {
       loadModelOptions({ refresh: true }).then((m) => {
         setAvailableModels(m);
@@ -1032,15 +1054,7 @@ export function Chat() {
     (async () => {
       await migrateLocalStorage();
       await refreshConversationList();
-      const metas = conversationMetas.value;
-      if (metas.length > 0) {
-        await loadConversation(metas[0].id);
-      } else {
-        const conv = await createConversation({});
-        activeConversation.value = conv;
-        activeSessionId.value = conv.id;
-        await refreshConversationList();
-      }
+      if (mountedRef.current) setConversationReady(true);
     })();
 
     const refreshAll = () => {
@@ -1060,6 +1074,10 @@ export function Chat() {
     window.addEventListener(providersChangedEvent, handleProvidersChanged);
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
+      mountedRef.current = false;
+      conversationNavigation.invalidate();
+      abortRef.current?.abort();
+      knowledgeReadRef.current?.abort();
       window.removeEventListener("focus", handleFocus);
       window.removeEventListener(providersChangedEvent, handleProvidersChanged);
       document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -1082,6 +1100,99 @@ export function Chat() {
       clearAudioPreviews();
     };
   }, []);
+
+
+  useEffect(() => {
+    if (!conversationReady) return;
+    if (!incomingLibrary && initializedConversationRef.current) return;
+    let cancelled = false;
+    const isCurrent = conversationNavigation.begin();
+    const mayActivate = () => !cancelled && mountedRef.current && isCurrent();
+    const controller = new AbortController();
+    const initialize = async () => {
+      try {
+        if (incomingLibrary) {
+          abortRef.current?.abort();
+          knowledgeReadRef.current?.abort();
+          const selection: KnowledgeChatSelection = {library_id: incomingLibrary, ...(incomingPage ? {page_ids: [incomingPage]} : {})};
+          // Resolve local data only; opening the link never sends a model request.
+          const library = await knowledgeRequest<KnowledgeLibrary>(libraryPath(incomingLibrary), "GET", undefined, controller.signal);
+          if (incomingPage && !library.pages.some(page => page.id === incomingPage)) throw new KnowledgeChatError("unavailablePage");
+          if (!mayActivate()) return;
+          const created = await createConversation({title: t("chat.knowledge.conversationTitle", library.name), settings: {knowledge: selection}});
+          if (!mayActivate()) return;
+          activeConversation.value = created;
+          activeSessionId.value = created.id;
+          inputText.value = "";
+          streamingContent.value = "";
+          chatError.value = "";
+          syncModelSelectionToConversation(created);
+          initializedConversationRef.current = true;
+          await refreshConversationList();
+          if (mayActivate()) route("/chat", true);
+        } else {
+          const metas = conversationMetas.value;
+          const conv = metas.length ? await getConversation(metas[0].id) : await createConversation({});
+          if (!mayActivate()) return;
+          activeConversation.value = conv;
+          activeSessionId.value = conv.id;
+          syncModelSelectionToConversation(conv);
+          initializedConversationRef.current = true;
+          await refreshConversationList();
+        }
+      } catch (error) {
+        if (mayActivate()) chatError.value = knowledgeErrorText(error);
+      }
+    };
+    void initialize();
+    return () => {cancelled = true; controller.abort();};
+  }, [conversationReady, incomingLibrary, incomingPage]);
+
+  const knowledgeSelection = activeConversation.value?.settings?.knowledge;
+  const knowledgeSelectionKey = JSON.stringify(knowledgeSelection || null);
+  useEffect(() => {
+    setKnowledgeLibrary(null);
+    setKnowledgePreview(null);
+    setKnowledgePreviewError("");
+    if (!knowledgeSelection) return;
+    let cancelled = false;
+    const selection = knowledgeSelection;
+    const controller = new AbortController();
+    const session = activeSessionId.value;
+    knowledgeRequest<KnowledgeLibrary>(libraryPath(selection.library_id), "GET", undefined, controller.signal)
+      .then(library => {
+        if (!cancelled && activeSessionId.value === session) {
+          setKnowledgeLibrary(library);
+          setKnowledgePreview(prepareKnowledgeContext(library, selection, inputText.value));
+        }
+      }).catch(error => {
+        if (!cancelled && activeSessionId.value === session) setKnowledgePreviewError(knowledgeErrorText(error));
+      });
+    return () => {cancelled = true; controller.abort();};
+  }, [activeSessionId.value, knowledgeSelectionKey]);
+
+  useEffect(() => {
+    if (!knowledgeLibrary || !knowledgeSelection || isGenerating.value || knowledgePreparing) return;
+    if (knowledgeLibrary.id !== knowledgeSelection.library_id) return;
+    try {
+      setKnowledgePreview(prepareKnowledgeContext(knowledgeLibrary, knowledgeSelection, inputText.value));
+      setKnowledgePreviewError("");
+    } catch (error) {setKnowledgePreview(null); setKnowledgePreviewError(knowledgeErrorText(error));}
+  }, [knowledgeLibrary, knowledgeSelectionKey, inputText.value, isGenerating.value, knowledgePreparing]);
+
+  const detachKnowledge = async () => {
+    const conv = activeConversation.value;
+    if (!conv || isGenerating.value || knowledgePreparing || knowledgeDetaching) return;
+    // Detaching also cancels a Send still awaiting cloud authentication.
+    conversationNavigation.invalidate();
+    setKnowledgeDetaching(true);
+    try {
+      const {knowledge: _knowledge, ...settings} = conv.settings || {};
+      const updated = await updateConversation(conv.id, {settings});
+      if (activeSessionId.value === conv.id) activeConversation.value = {...activeConversation.value!, settings: updated.settings};
+    } catch (error) {if (activeSessionId.value === conv.id) chatError.value = knowledgeErrorText(error);}
+    finally {if (mountedRef.current) setKnowledgeDetaching(false);}
+  };
 
   const syncStickToBottom = () => {
     const el = messagesRef.current;
@@ -1164,6 +1275,7 @@ export function Chat() {
   ]);
 
   const handleImageUpload = (e: Event) => {
+    if (knowledgeReadRef.current || knowledgePreparing) return;
     const files = (e.target as HTMLInputElement).files;
     if (!files) return;
     Array.from(files).forEach((file) => {
@@ -1179,6 +1291,7 @@ export function Chat() {
   };
 
   const removeImage = (idx: number) => {
+    if (knowledgeReadRef.current || knowledgePreparing) return;
     pendingImages.value = pendingImages.value.filter((_, i) => i !== idx);
   };
 
@@ -1191,6 +1304,7 @@ export function Chat() {
   };
 
   const handleAudioUpload = (e: Event) => {
+    if (knowledgeReadRef.current || knowledgePreparing) return;
     const files = (e.target as HTMLInputElement).files;
     const file = files?.[0];
     if (!file) return;
@@ -1205,6 +1319,7 @@ export function Chat() {
   };
 
   const removeAudio = () => {
+    if (knowledgeReadRef.current || knowledgePreparing) return;
     setPendingAudio(null);
   };
 
@@ -1334,7 +1449,13 @@ export function Chat() {
   };
 
   const handleSend = async () => {
-    const text = inputText.value.trim();
+    const intendedSession = activeSessionId.value;
+    if (!initializedConversationRef.current || incomingLibrary || knowledgeReadRef.current || knowledgeDetaching) return;
+    const submittedDraft = inputText.value;
+    const submittedModelKey = selectedModelKey.value;
+    const submittedImages = pendingImages.value;
+    const unchangedSubmission = () => inputText.value === submittedDraft && selectedModelKey.value === submittedModelKey && pendingImages.value === submittedImages;
+    const text = submittedDraft.trim();
     const currentModel = selectedModelInfo.value;
     const mode = getChatModelMode(currentModel);
     const imageMode = mode === "image";
@@ -1356,6 +1477,9 @@ export function Chat() {
       return;
     }
 
+    // Sending is the latest explicit choice: a previously requested history
+    // load or empty-conversation create must not replace its target mid-stream.
+    const ownsSubmission = conversationNavigation.begin();
     if (currentModel.source === "cloud") {
       const provider = currentModel.provider || configuredCloudProviderName();
       try {
@@ -1374,6 +1498,32 @@ export function Chat() {
     if (!conv) {
       chatError.value = "No active session. Please create a new chat.";
       return;
+    }
+
+    if (!ownsSubmission() || activeSessionId.value !== intendedSession || !mountedRef.current || !unchangedSubmission()) return;
+    let knowledgeContext: PreparedKnowledgeContext | undefined;
+    if (conv.settings?.knowledge) {
+      if (imageMode || asrMode || ttsMode || decisionMode) {
+        chatError.value = t("chat.knowledge.textOnly");
+        return;
+      }
+      const controller = new AbortController();
+      knowledgeReadRef.current = controller;
+      setKnowledgePreparing(true);
+      try {
+        const library = await knowledgeRequest<KnowledgeLibrary>(libraryPath(conv.settings.knowledge.library_id), "GET", undefined, controller.signal);
+        knowledgeContext = prepareKnowledgeContext(library, conv.settings.knowledge, text);
+        if (!ownsSubmission() || controller.signal.aborted || activeSessionId.value !== conv.id || !mountedRef.current || !unchangedSubmission()) return;
+        setKnowledgeLibrary(library);
+        setKnowledgePreview(knowledgeContext);
+        setKnowledgePreviewError("");
+      } catch (error) {
+        if (!controller.signal.aborted && activeSessionId.value === conv.id && mountedRef.current) chatError.value = knowledgeErrorText(error);
+        return;
+      } finally {
+        if (knowledgeReadRef.current === controller) knowledgeReadRef.current = null;
+        if (mountedRef.current) setKnowledgePreparing(false);
+      }
     }
 
     const images = pendingImages.value;
@@ -1419,7 +1569,7 @@ export function Chat() {
     const currentModelKey = modelKey(currentModel);
 
     const userMessageIndex = conv.messages.length;
-    conv.messages.push({ role: "user", content: userContent });
+    conv.messages.push({ role: "user", content: userContent, ...(knowledgeContext ? {meta: {knowledge: knowledgeContext.snapshot}} : {}) });
     if (asrMode && audio) {
       setAudioPreview(messagePreviewKey(conv.id, userMessageIndex), {
         name: audio.name,
@@ -1630,7 +1780,7 @@ export function Chat() {
           top_p: topP.value,
           max_tokens: maxTokens.value,
           num_ctx: numCtx,
-          system: systemPrompt.value || undefined,
+          system: [systemPrompt.value, knowledgeContext?.system].filter(Boolean).join("\n\n") || undefined,
           source: currentModel.source,
           thread_id: conv.id,
           trace_id: typeof crypto.randomUUID === "function"
@@ -1639,6 +1789,7 @@ export function Chat() {
           web_search: { enabled: false },
         },
         (token, done) => {
+          if (!mountedRef.current || activeSessionId.value !== conv.id || abortRef.current !== ac) return;
           if (done) {
             searchingQuery.value = "";
             const assistantContent = streamingContent.value;
@@ -1648,6 +1799,7 @@ export function Chat() {
               content: assistantContent,
               meta: {
                 ...buildResponseMeta(assistantContent, responseStartedAt),
+                ...(knowledgeContext ? {knowledge: knowledgeContext.snapshot} : {}),
                 ...(sources.length > 0 ? { sources } : {}),
               },
             });
@@ -1691,6 +1843,10 @@ export function Chat() {
         );
       }
     } catch (e: any) {
+      if (!mountedRef.current || activeSessionId.value !== conv.id || abortRef.current !== ac) {
+        if (abortRef.current === ac) {isGenerating.value = false; abortRef.current = null;}
+        return;
+      }
       const errMessage = e?.message || t("chat.failedResp");
       const localizedErrorMessage = localizeChatErrorMessage(errMessage, currentModel.provider || configuredCloudProviderName());
       if (streamingContent.value && !asrMode && !ttsMode && !decisionMode && (!ac.signal.aborted || !imageMode)) {
@@ -1701,6 +1857,7 @@ export function Chat() {
           content: assistantContent,
           meta: {
             ...buildResponseMeta(assistantContent, responseStartedAt),
+            ...(knowledgeContext ? {knowledge: knowledgeContext.snapshot} : {}),
             ...(sources.length > 0 ? { sources } : {}),
           },
         });
@@ -1717,6 +1874,10 @@ export function Chat() {
       }
     }
 
+    if (!mountedRef.current || activeSessionId.value !== conv.id || abortRef.current !== ac) {
+      if (abortRef.current === ac) {isGenerating.value = false; abortRef.current = null;}
+      return;
+    }
     searchingQuery.value = "";
     searchPlanningQuery.value = "";
     searchSkippedReason.value = "";
@@ -1733,9 +1894,13 @@ export function Chat() {
   };
 
   const handleNewSession = async () => {
+    if (!initializedConversationRef.current || incomingLibrary || isGenerating.value || knowledgeDetaching) return;
+    const isCurrent = conversationNavigation.begin();
+    knowledgeReadRef.current?.abort();
     try {
       openConversationMenuId.value = "";
       const conv = await createConversation({});
+      if (!isCurrent() || !mountedRef.current) return;
       activeConversation.value = conv;
       activeSessionId.value = conv.id;
       syncModelSelectionToConversation(conv);
@@ -1756,13 +1921,16 @@ export function Chat() {
   };
 
   const handleSelectConversation = async (id: string) => {
-    if (id === activeSessionId.value) return;
+    if (!initializedConversationRef.current || incomingLibrary || id === activeSessionId.value || isGenerating.value || knowledgeDetaching) return;
+    knowledgeReadRef.current?.abort();
     openConversationMenuId.value = "";
-    await loadConversation(id);
+    await loadConversation(id, () => mountedRef.current);
+    if (window.innerWidth < 1100) showSidebar.value = false;
   };
 
   const handleDeleteConversation = (id: string, e: Event) => {
     e.stopPropagation();
+    if (isGenerating.value || knowledgePreparing || knowledgeDetaching) return;
     openConversationMenuId.value = "";
     deleteDialogId.value = id;
   };
@@ -1774,6 +1942,7 @@ export function Chat() {
   };
 
   const handleClearHistory = () => {
+    if (isGenerating.value || knowledgePreparing) return;
     const conv = activeConversation.value;
     if (!conv || conv.messages.length === 0) return;
     clearHistoryOpen.value = true;
@@ -1805,15 +1974,18 @@ export function Chat() {
   const confirmDelete = async () => {
     const id = deleteDialogId.value;
     if (!id) return;
+    const isCurrent = conversationNavigation.begin();
     try {
       await deleteConversation(id);
       await refreshConversationList();
+      if (!isCurrent() || !mountedRef.current) return;
       if (id === activeSessionId.value) {
         const metas = conversationMetas.value;
         if (metas.length > 0) {
-          await loadConversation(metas[0].id);
+          await loadConversation(metas[0].id, () => mountedRef.current);
         } else {
           const conv = await createConversation({});
+          if (!isCurrent() || !mountedRef.current) return;
           activeConversation.value = conv;
           activeSessionId.value = conv.id;
           await refreshConversationList();
@@ -1867,10 +2039,10 @@ export function Chat() {
       : Boolean(inputText.value.trim() && selectedModelInfo.value);
 
   return (
-    <div class="page-shell flex h-full min-h-0 gap-0 bg-[#f7f8fb]">
+    <div class="page-shell relative flex h-full min-h-0 gap-0 bg-[#f7f8fb]">
       {/* Conversation history */}
       {showSidebar.value && (
-        <aside class="mr-4 flex h-full min-h-0 w-[280px] flex-shrink-0 flex-col rounded-[22px] border border-gray-200 bg-white shadow-sm">
+        <aside class="absolute inset-y-4 left-4 z-20 mr-4 flex min-h-0 w-[280px] max-w-[calc(100%-32px)] flex-shrink-0 flex-col rounded-[22px] border border-gray-200 bg-white shadow-sm min-[1100px]:static min-[1100px]:h-full">
           <div class="flex items-center justify-between border-b border-gray-100 px-5 py-4">
             <span class="text-sm font-semibold text-gray-900">{t("chat.conversationHistory")}</span>
             <button
@@ -2078,7 +2250,7 @@ export function Chat() {
             )}
             {messages.map((m, i) => (
               <MessageBubble
-                key={i}
+                key={`${conv?.id}:${i}`}
                 message={m}
                 audioPreview={audioPreviews.value[messagePreviewKey(activeSessionId.value, i)]}
               />
@@ -2111,6 +2283,7 @@ export function Chat() {
                     <img src={img.thumb} class="h-16 w-16 rounded-xl border border-gray-200 object-cover" />
                     <button
                       onClick={() => removeImage(i)}
+                      disabled={knowledgePreparing}
                       class="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white opacity-0 transition-opacity group-hover:opacity-100"
                     >
                       x
@@ -2137,6 +2310,7 @@ export function Chat() {
                   <audio src={pendingAudio.value.objectUrl} controls class="h-8 max-w-[220px]" />
                   <button
                     onClick={removeAudio}
+                    disabled={knowledgePreparing}
                     class="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-white text-cyan-500 hover:text-red-500"
                     title={t("chat.removeAudio")}
                   >
@@ -2145,7 +2319,19 @@ export function Chat() {
                 </div>
               </div>
             )}
-            <div class="rounded-[24px] border border-gray-200 bg-white p-3 shadow-[0_16px_50px_rgba(15,23,42,0.08)]">
+            {knowledgeSelection && (
+              <section class="mb-3 rounded-xl border border-indigo-200 bg-indigo-50/70 px-4 py-3 text-xs" aria-label={t("chat.knowledge.attached")}>
+                <div class="flex items-center justify-between gap-3">
+                  <a href={`/knowledge?library=${encodeURIComponent(knowledgeSelection.library_id)}`} class="font-semibold text-indigo-800 hover:underline">{t("chat.knowledge.attached")} · {knowledgePreview?.snapshot.library_name || knowledgeSelection.library_id}</a>
+                  <button type="button" disabled={isGenerating.value || knowledgePreparing || knowledgeDetaching} onClick={() => void detachKnowledge()} class="shrink-0 text-sm text-indigo-600 hover:text-indigo-800 disabled:opacity-40">{t("chat.knowledge.detach")}</button>
+                </div>
+                {knowledgePreview && <div class="mt-2 flex flex-wrap gap-1.5">{knowledgePreview.snapshot.pages.map(page => <a href={`/knowledge?library=${encodeURIComponent(knowledgeSelection.library_id)}&page=${encodeURIComponent(page.id)}`} class="rounded border border-indigo-100 bg-white px-2 py-1 text-xs text-indigo-600">{page.title} · v{page.version}</a>)}</div>}
+                <p class="mt-2 leading-5 text-indigo-600">{knowledgePreparing ? t("chat.knowledge.preparing") : t("chat.knowledge.sendHint", selectedModelInfo.value ? modelLabel(selectedModelInfo.value) : t("chat.knowledge.selectedModel"))}</p>
+                <p class="mt-1 text-xs text-indigo-600">{t("chat.knowledge.limitHint")}{knowledgePreview?.truncated ? ` · ${t("chat.knowledge.truncated")}` : ""}</p>
+                {knowledgePreviewError && <p class="mt-2 text-amber-700" role="status">{knowledgePreviewError}</p>}
+              </section>
+            )}
+            <fieldset disabled={knowledgePreparing} class="min-w-0 rounded-[24px] border border-gray-200 bg-white p-3 shadow-[0_16px_50px_rgba(15,23,42,0.08)]">
               {decisionMode ? (
                 <div class="space-y-2 px-1 pb-1">
                   <div class="flex flex-wrap items-center gap-2">
@@ -2379,9 +2565,9 @@ export function Chat() {
                 ) : (
                   <button
                     onClick={handleSend}
-                    disabled={!canSend}
+                    disabled={!canSend || !initializedConversationRef.current || !!incomingLibrary || knowledgePreparing || knowledgeDetaching}
                     class="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white transition-colors hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-40"
-                    title={decisionMode ? t("chat.decisionSend") : asrMode ? t("chat.transcribe") : ttsMode ? t("chat.speak") : t("chat.send")}
+                    title={knowledgePreparing ? t("chat.knowledge.preparing") : decisionMode ? t("chat.decisionSend") : asrMode ? t("chat.transcribe") : ttsMode ? t("chat.speak") : t("chat.send")}
                   >
                     <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M5 10l7-7m0 0l7 7m-7-7v18" />
@@ -2389,7 +2575,7 @@ export function Chat() {
                   </button>
                 )}
               </div>
-            </div>
+            </fieldset>
           </div>
         </div>
       </section>
@@ -2709,6 +2895,7 @@ function MessageBubble({ message, streaming, audioPreview }: { message: ChatMess
             <audio src={audioPreview.objectUrl} controls class="h-8 w-full max-w-[260px]" />
           </div>
         )}
+        {!isUser && !streaming && message.meta?.knowledge && <KnowledgeMessageActions snapshot={message.meta.knowledge} answer={parseReasoningText(plainText).answer} />}
         {!isUser && !streaming && (
           <div class="mt-3 flex min-w-0 max-w-full flex-wrap items-center gap-2 text-xs text-gray-300">
             <button
@@ -2823,4 +3010,44 @@ function SliderSetting({
       />
     </div>
   );
+}
+
+function knowledgeErrorText(error: unknown): string {
+  if (error instanceof KnowledgeChatError) return t(`chat.knowledge.error.${error.code}`);
+  return error instanceof Error ? error.message : t("chat.knowledge.loadFailed");
+}
+
+function KnowledgeMessageActions({snapshot, answer}: {snapshot: KnowledgeChatSnapshot; answer: string}) {
+  const [showTitle, setShowTitle] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [proposalId, setProposalId] = useState("");
+  const ids = citedKnowledgeSources(answer);
+  const supported = ids.length > 0 && ids.every(id => snapshot.sources.some(source => source.id === id));
+  const defaultTitle = t("chat.knowledge.answerTitle", snapshot.pages[0]?.title || snapshot.library_name);
+  const saveAnswer = async (title: string) => {
+    if (saving) return;
+    setSaving(true); setError("");
+    try {
+      const library = await knowledgeRequest<KnowledgeLibrary>(libraryPath(snapshot.library_id));
+      const change = answerToKnowledgeChange(answer, title, snapshot, library);
+      const before = new Set(library.proposals.map(proposal => proposal.id));
+      const updated = await knowledgeRequest<KnowledgeLibrary>(libraryPath(snapshot.library_id, "/proposals"), "POST", {title, kind: "model", changes: [change]});
+      const proposal = updated.proposals.find(item => !before.has(item.id));
+      if (!proposal) throw new Error(t("chat.knowledge.saveFailed"));
+      setProposalId(proposal.id); setShowTitle(false);
+    } catch (e) {setError(knowledgeErrorText(e));}
+    finally {setSaving(false);}
+  };
+  return <section class="mt-4 rounded-xl border border-indigo-100 bg-indigo-50/40 px-3 py-3" aria-label={t("chat.knowledge.usedSources")}>
+    <div class="flex flex-wrap items-center justify-between gap-2 text-xs"><strong class="font-medium text-indigo-700">{t("chat.knowledge.usedSources")} · {snapshot.library_name}</strong><span class="text-gray-500">{t("chat.knowledge.historicalSnapshot")}</span></div>
+    <div class="mt-2 flex flex-wrap gap-1.5">{snapshot.pages.map(page => <a key={page.id} href={`/knowledge?library=${encodeURIComponent(snapshot.library_id)}&page=${encodeURIComponent(page.id)}`} class="rounded border border-indigo-100 bg-white px-2 py-1 text-xs text-indigo-600 hover:border-indigo-300">{page.title} · v{page.version}</a>)}</div>
+    {snapshot.sources.length > 0 && <p class="mt-2 text-xs leading-5 text-gray-500">{snapshot.sources.map(source => source.title).join(" · ")}</p>}
+    <div class="mt-3 flex flex-wrap items-center gap-3 border-t border-indigo-100 pt-2">
+      {proposalId ? <a class="text-sm font-medium text-indigo-700 hover:underline" href={`/knowledge?library=${encodeURIComponent(snapshot.library_id)}&view=review&proposal=${encodeURIComponent(proposalId)}`}>{t("chat.knowledge.reviewDraft")}</a> : <button type="button" disabled={!supported || saving} class="rounded-md bg-white px-2.5 py-1.5 text-sm font-medium text-indigo-600 ring-1 ring-indigo-200 hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-50" onClick={() => setShowTitle(true)}>{t("chat.knowledge.saveDraft")}</button>}
+      <span class="text-xs leading-5 text-gray-500">{proposalId ? t("chat.knowledge.savedDraft") : supported ? t("chat.knowledge.reviewRequired") : ids.length ? t("chat.knowledge.error.invalidCitation") : t("chat.knowledge.error.noCitations")}</span>
+    </div>
+    {error && <p class="mt-2 text-xs text-red-600" role="alert">{error}</p>}
+    <PromptDialog open={showTitle} title={t("chat.knowledge.saveDraft")} description={saving ? t("chat.knowledge.saving") : error || t("chat.knowledge.reviewRequired")} initialValue={defaultTitle} confirmLabel={saving ? t("chat.knowledge.saving") : t("chat.knowledge.saveDraft")} onConfirm={title => {if (!saving) void saveAnswer(title);}} onCancel={() => {if (!saving) setShowTitle(false);}} />
+  </section>;
 }

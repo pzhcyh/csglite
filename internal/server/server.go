@@ -29,6 +29,7 @@ import (
 	"github.com/opencsgs/csglite/internal/dataset"
 	"github.com/opencsgs/csglite/internal/imagegen"
 	"github.com/opencsgs/csglite/internal/inference"
+	"github.com/opencsgs/csglite/internal/knowledge"
 	"github.com/opencsgs/csglite/internal/license"
 	"github.com/opencsgs/csglite/internal/model"
 	"github.com/opencsgs/csglite/internal/modelmetadata"
@@ -182,6 +183,7 @@ func engineModelIDFromKey(key string) string {
 }
 
 type Server struct {
+	knowledge        *knowledge.Store
 	cfg              *config.Config
 	version          string
 	manager          *model.Manager
@@ -329,6 +331,11 @@ func New(cfg *config.Config, version string) *Server {
 		datasetExportJobs: newDatasetExportJobStore(),
 		loadSteps:         make(map[string]loadStepState),
 		logBuf:            logBuf,
+	}
+	if store, err := knowledge.Open(storageRoot); err != nil {
+		log.Printf("KNOWLEDGE: storage unavailable: %v", err)
+	} else {
+		s.knowledge = store
 	}
 	s.appShells = newAIAppShellManager()
 	if store, err := observability.Open(storageRoot); err != nil {

@@ -81,18 +81,27 @@ func TestProviderScopedRouteFamilyIsDocumented(t *testing.T) {
 func readDeclaredDocumentedRoutes(t *testing.T) map[string]struct{} {
 	t.Helper()
 
-	data, err := os.ReadFile("routes.go")
-	if err != nil {
-		t.Fatalf("read routes.go: %v", err)
-	}
-
 	operations := make(map[string]struct{})
-	matches := documentedRoutePattern.FindAllStringSubmatch(string(data), -1)
-	for _, match := range matches {
-		if len(match) != 3 {
+	files, err := filepath.Glob("handlers_knowledge_*.go")
+	if err != nil {
+		t.Fatal(err)
+	}
+	files = append(files, "routes.go")
+	for _, name := range files {
+		if strings.HasSuffix(name, "_test.go") {
 			continue
 		}
-		operations[match[1]+" "+match[2]] = struct{}{}
+		data, err := os.ReadFile(name)
+		if err != nil {
+			t.Fatalf("read %s: %v", name, err)
+		}
+		matches := documentedRoutePattern.FindAllStringSubmatch(string(data), -1)
+		for _, match := range matches {
+			if len(match) != 3 {
+				continue
+			}
+			operations[match[1]+" "+match[2]] = struct{}{}
+		}
 	}
 	if len(operations) == 0 {
 		t.Fatal("no documented /api or /v1 routes found in routes.go")

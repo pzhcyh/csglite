@@ -22,12 +22,21 @@ const navKeys = [
   { id: "marketplace", path: "/marketplace", key: "nav.marketplace", icon: MarketplaceIcon },
   { id: "library", path: "/library", key: "nav.library", icon: LibraryIcon },
   { id: "datasets", path: "/datasets", key: "nav.datasets", icon: DatasetsIcon },
+  { id: "knowledge", path: "/knowledge", key: "nav.knowledge", icon: KnowledgeIcon },
   { id: "chat", path: "/chat", key: "nav.chat", icon: ChatIcon },
   { id: "ai-apps", path: "/ai-apps", key: "nav.aiApps", icon: AIAppsIcon },
   { id: "ai-gateway", path: "/ai-gateway", key: "nav.aiGateway", icon: AIGatewayIcon },
   { id: "cluster", path: "/cluster", key: "nav.cluster", icon: ClusterIcon },
   { id: "observability", path: "/observability", key: "nav.observability", icon: ObservabilityIcon },
 ];
+
+function KnowledgeIcon({ active }: { active: boolean }) {
+  return (
+    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke={active ? "currentColor" : "#9CA3AF"} stroke-width="1.8" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 6c-3-2-6-2-9-1v14c3-1 6-1 9 1m0-14c3-2 6-2 9-1v14c-3-1-6-1-9 1m0-14v14" />
+    </svg>
+  );
+}
 
 function SettingsIcon({ active }: { active: boolean }) {
   return (
@@ -81,8 +90,8 @@ export function Layout({ children }: { children: ComponentChildren }) {
   const showNavItem = (id: string) => hiddenNavItems !== null && !hiddenNavItems.has(id);
 
   return (
-    <div class="flex h-screen overflow-hidden">
-      <aside class="w-52 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col">
+    <div class={`flex h-screen overflow-hidden ${path === "/knowledge" ? "knowledge-shell" : ""}`}>
+      <aside class="csg-primary-sidebar w-52 flex-shrink-0 border-r border-gray-200 bg-white flex flex-col">
         <div class="flex items-center gap-2 px-5 py-5">
           <img src="/favicon.svg" alt={productTitle(license)} class="w-8 h-8" />
           <span class="font-semibold text-base text-gray-900" title={isLicensed(license) ? t("settings.licenseEditionEnterprise") : undefined}>

@@ -26,6 +26,14 @@ func (s *Server) desktopAuthMiddleware(next http.Handler) http.Handler {
 			return
 		}
 
+		// Native MCP clients authenticate with their own per-library credential.
+		// Only this exact data-plane endpoint bypasses the WebView session; its
+		// handler still enforces loopback peer, Origin and connector authorization.
+		if r.URL.Path == "/api/knowledge/mcp" && isLoopbackRequest(r) && (r.Method == http.MethodPost || r.Method == http.MethodGet) {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		if r.Method == http.MethodGet && r.URL.Path == "/" {
 			token := strings.TrimSpace(r.URL.Query().Get("desktop_token"))
 			if secureTokenEqual(token, s.cfg.DesktopToken) && s.desktopBootstrapped.CompareAndSwap(false, true) {

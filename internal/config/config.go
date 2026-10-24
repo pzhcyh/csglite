@@ -2,6 +2,7 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -24,6 +25,7 @@ const (
 	ChinaHuggingFaceEndpoint   = "https://hf-mirror.com"
 	DefaultModelScopeEndpoint  = "https://modelscope.cn"
 	EnvServerURL               = "CSGHUB_LITE_SERVER_URL"
+	EnvAppHome                 = "CSGHUB_LITE_HOME"
 	EnvAIGatewayURL            = "CSGHUB_LITE_AI_GATEWAY_URL"
 	EnvCloudProviderName       = "CSGHUB_LITE_CLOUD_PROVIDER_NAME"
 	EnvOpenAIStreamDefault     = "CSGHUB_LITE_OPENAI_STREAM_DEFAULT"
@@ -353,6 +355,14 @@ var (
 )
 
 func AppHome() (string, error) {
+	// An explicit home keeps development instances, their credentials and
+	// background services separate from the user's regular installation.
+	if path := strings.TrimSpace(os.Getenv(EnvAppHome)); path != "" {
+		if !filepath.IsAbs(path) {
+			return "", fmt.Errorf("%s must be an absolute path", EnvAppHome)
+		}
+		return filepath.Clean(path), nil
+	}
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return "", err

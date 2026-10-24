@@ -114,16 +114,16 @@ func (s *Server) routes() http.Handler {
 	mux.HandleFunc("POST /api/api-keys", s.handleAPIKeyCreate)
 	mux.HandleFunc("DELETE /api/api-keys/{id}", s.handleAPIKeyDelete)
 	mux.HandleFunc("GET /api/api-usage", s.handleAPIUsage)
-	mux.HandleFunc("GET /api/observability/requests", s.handleObservabilityRequests)
-	mux.HandleFunc("GET /api/observability/requests/{id}", s.handleObservabilityRequest)
-	mux.HandleFunc("GET /api/observability/facets", s.handleObservabilityFacets)
-	mux.HandleFunc("GET /api/observability/traces", s.handleObservabilityTraces)
-	mux.HandleFunc("GET /api/observability/traces/{traceID}", s.handleObservabilityTrace)
-	mux.HandleFunc("POST /api/observability/dataset-exports/preview", s.handleDatasetExportPreview)
-	mux.HandleFunc("POST /api/observability/dataset-exports", s.handleDatasetExportCreate)
-	mux.HandleFunc("GET /api/observability/dataset-export-jobs/{jobID}", s.handleDatasetExportJob)
-	mux.HandleFunc("GET /api/observability/dataset-exports/{exportID}/download", s.handleDatasetExportDownload)
-	mux.HandleFunc("DELETE /api/observability", s.handleObservabilityClear)
+	mux.HandleFunc("GET /api/observability/requests", localManagementOnly(s.handleObservabilityRequests))
+	mux.HandleFunc("GET /api/observability/requests/{id}", localManagementOnly(s.handleObservabilityRequest))
+	mux.HandleFunc("GET /api/observability/facets", localManagementOnly(s.handleObservabilityFacets))
+	mux.HandleFunc("GET /api/observability/traces", localManagementOnly(s.handleObservabilityTraces))
+	mux.HandleFunc("GET /api/observability/traces/{traceID}", localManagementOnly(s.handleObservabilityTrace))
+	mux.HandleFunc("POST /api/observability/dataset-exports/preview", localManagementOnly(s.handleDatasetExportPreview))
+	mux.HandleFunc("POST /api/observability/dataset-exports", localManagementOnly(s.handleDatasetExportCreate))
+	mux.HandleFunc("GET /api/observability/dataset-export-jobs/{jobID}", localManagementOnly(s.handleDatasetExportJob))
+	mux.HandleFunc("GET /api/observability/dataset-exports/{exportID}/download", localManagementOnly(s.handleDatasetExportDownload))
+	mux.HandleFunc("DELETE /api/observability", localManagementOnly(s.handleObservabilityClear))
 	// Third-party providers
 	mux.HandleFunc("GET /api/providers", s.handleProvidersList)
 	mux.HandleFunc("POST /api/providers/validate", s.handleProviderValidate)
@@ -183,13 +183,34 @@ func (s *Server) routes() http.Handler {
 	mux.HandleFunc("GET /api/apps/shell/{id}/ws", s.handleAppShellWS)
 	mux.HandleFunc("POST /api/apps/shell/{id}/close", s.handleAppShellClose)
 
-	// Conversation history
-	mux.HandleFunc("GET /api/conversations", s.handleConversationsList)
-	mux.HandleFunc("POST /api/conversations", s.handleConversationCreate)
-	mux.HandleFunc("GET /api/conversations/search", s.handleConversationsSearch)
-	mux.HandleFunc("GET /api/conversations/{id}", s.handleConversationGet)
-	mux.HandleFunc("PUT /api/conversations/{id}", s.handleConversationUpdate)
-	mux.HandleFunc("DELETE /api/conversations/{id}", s.handleConversationDelete)
+	// Private local knowledge workspace; excluded from externalAPIRoutes.
+	mux.HandleFunc("GET /api/knowledge", s.knowledgeOnly(s.handleKnowledgeList))
+	mux.HandleFunc("POST /api/knowledge/libraries", s.knowledgeOnly(s.handleKnowledgeCreate))
+	mux.HandleFunc("GET /api/knowledge/libraries/{library}", s.knowledgeOnly(s.handleKnowledgeGet))
+	mux.HandleFunc("POST /api/knowledge/libraries/{library}/demo", s.knowledgeOnly(s.handleKnowledgeDemo))
+	mux.HandleFunc("POST /api/knowledge/libraries/{library}/sources", s.knowledgeOnly(s.handleKnowledgeAddSource))
+	mux.HandleFunc("POST /api/knowledge/libraries/{library}/sources/{source}/withdraw", s.knowledgeOnly(s.handleKnowledgeWithdraw))
+	mux.HandleFunc("POST /api/knowledge/libraries/{library}/pages", s.knowledgeOnly(s.handleKnowledgeSavePage))
+	mux.HandleFunc("PUT /api/knowledge/libraries/{library}/pages/{page}", s.knowledgeOnly(s.handleKnowledgeSavePage))
+	mux.HandleFunc("POST /api/knowledge/libraries/{library}/pages/{page}/restore", s.knowledgeOnly(s.handleKnowledgeRestore))
+	mux.HandleFunc("POST /api/knowledge/libraries/{library}/proposals", s.knowledgeOnly(s.handleKnowledgePropose))
+	mux.HandleFunc("POST /api/knowledge/libraries/{library}/proposals/{proposal}/accept", s.knowledgeOnly(s.handleKnowledgeAccept))
+	mux.HandleFunc("POST /api/knowledge/libraries/{library}/proposals/{proposal}/reject", s.knowledgeOnly(s.handleKnowledgeReject))
+	mux.HandleFunc("PUT /api/knowledge/libraries/{library}/config", s.knowledgeOnly(s.handleKnowledgeConfig))
+	mux.HandleFunc("GET /api/knowledge/libraries/{library}/export", s.knowledgeOnly(s.handleKnowledgeExport))
+	mux.HandleFunc("GET /api/knowledge/libraries/{library}/context", s.knowledgeOnly(s.handleKnowledgeContext))
+	mux.HandleFunc("GET /api/knowledge/libraries/{library}/backup", s.knowledgeOnly(s.handleKnowledgeBackup))
+	mux.HandleFunc("POST /api/knowledge/restore", s.knowledgeOnly(s.handleKnowledgeRestoreBackup))
+	s.registerKnowledgeConnectorRoutes(mux)
+	s.registerKnowledgeStewardRoutes(mux)
+
+	// Conversation history may contain knowledge-derived private context.
+	mux.HandleFunc("GET /api/conversations", localManagementOnly(s.handleConversationsList))
+	mux.HandleFunc("POST /api/conversations", localManagementOnly(s.handleConversationCreate))
+	mux.HandleFunc("GET /api/conversations/search", localManagementOnly(s.handleConversationsSearch))
+	mux.HandleFunc("GET /api/conversations/{id}", localManagementOnly(s.handleConversationGet))
+	mux.HandleFunc("PUT /api/conversations/{id}", localManagementOnly(s.handleConversationUpdate))
+	mux.HandleFunc("DELETE /api/conversations/{id}", localManagementOnly(s.handleConversationDelete))
 
 	// Upgrade API
 	mux.HandleFunc("GET /api/upgrade/check", s.handleUpgradeCheck)
@@ -282,6 +303,18 @@ func desktopExternalAPIMiddleware(next http.Handler) http.Handler {
 
 func (s *Server) corsMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if isLocalManagementPath(r.URL.Path) {
+			// Preflight must enforce the same origin/peer/Host policy as the
+			// actual handlers, instead of granting the inference API's CORS.
+			localManagementOnly(func(w http.ResponseWriter, r *http.Request) {
+				if r.Method == http.MethodOptions {
+					w.WriteHeader(http.StatusNoContent)
+					return
+				}
+				next.ServeHTTP(w, r)
+			})(w, r)
+			return
+		}
 		if s.cfg.DesktopMode {
 			if origin := r.Header.Get("Origin"); origin != "" && isAllowedDesktopOrigin(r) {
 				w.Header().Set("Access-Control-Allow-Origin", origin)

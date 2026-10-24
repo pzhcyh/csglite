@@ -333,11 +333,36 @@ type Message struct {
 }
 
 type MessageMeta struct {
-	Tokens     int               `json:"tokens,omitempty"`
-	Speed      float64           `json:"speed,omitempty"`
-	DurationMS int64             `json:"duration_ms,omitempty"`
-	Estimated  bool              `json:"estimated,omitempty"`
-	Sources    []WebSearchResult `json:"sources,omitempty"`
+	Tokens     int                       `json:"tokens,omitempty"`
+	Speed      float64                   `json:"speed,omitempty"`
+	DurationMS int64                     `json:"duration_ms,omitempty"`
+	Estimated  bool                      `json:"estimated,omitempty"`
+	Sources    []WebSearchResult         `json:"sources,omitempty"`
+	Knowledge  *MessageKnowledgeSnapshot `json:"knowledge,omitempty"`
+}
+
+// MessageKnowledgeSnapshot records the context selected for this message at
+// generation time. It is historical provenance, not a live library permission
+// or a server assertion that the model used every recorded source.
+type MessageKnowledgeSnapshot struct {
+	LibraryID   string                    `json:"library_id"`
+	LibraryName string                    `json:"library_name"`
+	CapturedAt  string                    `json:"captured_at"`
+	Pages       []KnowledgePageSnapshot   `json:"pages"`
+	Sources     []KnowledgeSourceSnapshot `json:"sources"`
+}
+
+type KnowledgePageSnapshot struct {
+	ID        string   `json:"id"`
+	Title     string   `json:"title"`
+	Version   int      `json:"version"`
+	SourceIDs []string `json:"source_ids"`
+}
+
+type KnowledgeSourceSnapshot struct {
+	ID     string `json:"id"`
+	Title  string `json:"title"`
+	SHA256 string `json:"sha256"`
 }
 
 type Tool struct {
@@ -1491,8 +1516,16 @@ type ConversationMeta struct {
 }
 
 type ConversationSettings struct {
-	NumCtx      int `json:"num_ctx,omitempty"`
-	NumParallel int `json:"num_parallel,omitempty"`
+	NumCtx      int                             `json:"num_ctx,omitempty"`
+	NumParallel int                             `json:"num_parallel,omitempty"`
+	Knowledge   *ConversationKnowledgeSelection `json:"knowledge,omitempty"`
+}
+
+// ConversationKnowledgeSelection keeps the user's knowledge selection for the
+// next turn; absent page_ids means all eligible pages in the selected library.
+type ConversationKnowledgeSelection struct {
+	LibraryID string   `json:"library_id"`
+	PageIDs   []string `json:"page_ids,omitempty"`
 }
 
 type ConversationsListResponse struct {

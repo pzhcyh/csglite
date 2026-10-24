@@ -123,8 +123,16 @@ const groupedApps = computed(() => {
 const selectedApp = computed(() => aiAppsCatalog.find((app) => app.id === selectedAppId.value) || null);
 
 export function AIApps() {
-  const { route } = useLocation();
+  const { route, query } = useLocation();
   void locale.value;
+
+  useEffect(() => {
+    // A deep link opens details only. It must never install or restart an app.
+    if (query.app && aiAppsCatalog.some((app) => app.id === query.app)) {
+      selectedAppId.value = query.app;
+      drawerMode.value = "details";
+    }
+  }, [query.app]);
 
   useEffect(() => {
     let disposed = false;

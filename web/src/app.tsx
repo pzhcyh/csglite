@@ -14,6 +14,7 @@ import { AIApps } from "./pages/AIApps";
 import { AIAppShell } from "./pages/AIAppShell";
 import { AIGateway } from "./pages/AIGateway";
 import { Cluster } from "./pages/Cluster";
+import { Knowledge } from "./pages/Knowledge";
 import { Observability, ObservabilityTraceDetailPage } from "./pages/Observability";
 
 export function App() {
@@ -39,6 +40,7 @@ function AppRoutes() {
         <Route path="/library/detail/:model" component={LibraryModelDetail} />
         <Route path="/library" component={Library} />
         <Route path="/datasets" component={Datasets} />
+        <Route path="/knowledge" component={Knowledge} />
         <Route path="/chat" component={Chat} />
         <Route path="/images/history" component={ImageHistory} />
         <Route path="/images" component={ImageGeneration} />

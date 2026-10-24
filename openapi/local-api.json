@@ -3206,8 +3206,20 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/observability/requests": {
@@ -3243,8 +3255,20 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/observability/requests/{id}": {
@@ -3260,8 +3284,20 @@
             "description": "Request metadata and captured payloads.",
             "content": {"application/json": {"schema": {"$ref": "#/components/schemas/ObservabilityRequest"}}}
           },
-          "404": {"$ref": "#/components/responses/NotFound"}
-        }
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/observability/facets": {
@@ -3283,8 +3319,20 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/observability/traces": {
@@ -3318,8 +3366,20 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/observability/traces/{traceID}": {
@@ -3345,8 +3405,20 @@
               }
             }
           },
-          "404": {"$ref": "#/components/responses/NotFound"}
-        }
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/observability/dataset-exports/preview": {
@@ -3363,15 +3435,27 @@
             "description": "Exportable, converted, excluded, and privacy-risk counts with a sanitized sample.",
             "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetExportPreview"}}}
           },
-          "400": {"$ref": "#/components/responses/BadRequest"}
-        }
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/observability/dataset-exports": {
       "post": {
         "tags": ["System"],
         "summary": "Start a local trace dataset export",
-        "description": "Accepts explicit trace IDs or a server-side trace filter spanning every page, then queues a bounded-memory export job. Completed exports are registered in the local dataset library.",
+        "description": "Accepts explicit trace IDs or a server-side trace filter spanning every page, then queues a bounded-memory export job. Completed exports are registered in the local dataset library.\n\nPrivate local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener.",
         "operationId": "createTraceDatasetExport",
         "requestBody": {
           "required": true,
@@ -3382,7 +3466,18 @@
             "description": "Dataset export job queued.",
             "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetExportJob"}}}
           },
-          "400": {"$ref": "#/components/responses/BadRequest"}
+          "400": {"$ref": "#/components/responses/BadRequest"},
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
         }
       }
     },
@@ -3399,8 +3494,20 @@
             "description": "Current export status and completed local dataset metadata.",
             "content": {"application/json": {"schema": {"$ref": "#/components/schemas/DatasetExportJob"}}}
           },
-          "404": {"$ref": "#/components/responses/NotFound"}
-        }
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/observability/dataset-exports/{exportID}/download": {
@@ -3413,8 +3520,20 @@
         ],
         "responses": {
           "307": {"description": "Redirects to the local dataset streaming ZIP endpoint."},
-          "404": {"$ref": "#/components/responses/NotFound"}
-        }
+          "404": {"$ref": "#/components/responses/NotFound"},
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/providers": {
@@ -3795,8 +3914,20 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       },
       "post": {
         "tags": [
@@ -3827,8 +3958,20 @@
           },
           "400": {
             "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/conversations/search": {
@@ -3859,8 +4002,20 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/conversations/{id}": {
@@ -3893,8 +4048,20 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       },
       "put": {
         "tags": [
@@ -3938,8 +4105,20 @@
           },
           "404": {
             "$ref": "#/components/responses/NotFound"
+          },
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       },
       "delete": {
         "tags": [
@@ -3967,8 +4146,20 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Access denied by local management peer, Host, or Origin policy.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
           }
-        }
+        },
+        "description": "Private local management API: requires a loopback peer, a loopback Host, and a same-origin HTTP browser Origin (or no Origin for local clients). Cross-origin, non-loopback, and DNS-rebinding requests return 403, including preflight. Responses use Cache-Control: no-store and do not grant CORS. Not exposed on the external desktop inference listener."
       }
     },
     "/api/upgrade/check": {
@@ -8009,6 +8200,2398 @@
           }
         }
       }
+    },
+    "/api/knowledge": {
+      "get": {
+        "tags": ["Knowledge"],
+        "summary": "List local knowledge libraries",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgeGetApiKnowledge",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"libraries": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/knowledge/libraries": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Create an empty knowledge library",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePostApiKnowledgeLibraries",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {"name": {"type": "string"}, "description": {"type": "string"}},
+                "required": ["name"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/knowledge/libraries/{library}": {
+      "get": {
+        "tags": ["Knowledge"],
+        "summary": "Read one knowledge library",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgeGetApiKnowledgeLibrariesLibrary",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}]
+      }
+    },
+    "/api/knowledge/libraries/{library}/demo": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Load fictional demo into an empty library",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryDemo",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "requestBody": {"required": false, "content": {"application/json": {"schema": {"type": "object", "properties": {}}}}}
+      }
+    },
+    "/api/knowledge/libraries/{library}/sources": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Preserve an immutable UTF-8 Markdown or text original",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibrarySources",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {"type": "string"},
+                  "filename": {"type": "string"},
+                  "content": {"type": "string", "maxLength": 2097152}
+                },
+                "required": ["title", "filename", "content"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/knowledge/libraries/{library}/sources/{source}/withdraw": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Withdraw a source and mark dependent Wiki pages stale",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibrarySourcesSourceWithdraw",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {"name": "library", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "source", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {"required": false, "content": {"application/json": {"schema": {"type": "object", "properties": {}}}}}
+      }
+    },
+    "/api/knowledge/libraries/{library}/pages": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Create a published Wiki page",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryPages",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {"type": "string"},
+                  "content": {"type": "string"},
+                  "sourceIds": {"type": "array", "items": {"type": "string"}}
+                },
+                "required": ["title", "content", "sourceIds"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/knowledge/libraries/{library}/pages/{page}": {
+      "put": {
+        "tags": ["Knowledge"],
+        "summary": "Save a Wiki revision with optimistic version check",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePutApiKnowledgeLibrariesLibraryPagesPage",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {"name": "library", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "page", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {"type": "string"},
+                  "content": {"type": "string"},
+                  "sourceIds": {"type": "array", "items": {"type": "string"}},
+                  "expectedVersion": {"type": "integer"}
+                },
+                "required": ["title", "content", "sourceIds", "expectedVersion"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/knowledge/libraries/{library}/pages/{page}/restore": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Restore a historical revision as a new version",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryPagesPageRestore",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {"name": "library", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "page", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {"version": {"type": "integer"}, "expectedVersion": {"type": "integer"}},
+                "required": ["version", "expectedVersion"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/knowledge/libraries/{library}/proposals": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Create an uncommitted review proposal",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryProposals",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {"type": "string"},
+                  "kind": {"type": "string", "enum": ["manual", "model", "claw"]},
+                  "changes": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeChange"}}
+                },
+                "required": ["title", "kind", "changes"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/knowledge/libraries/{library}/proposals/{proposal}/accept": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Atomically accept all changes after revalidation",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryProposalsProposalAccept",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {"name": "library", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "proposal", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {"required": false, "content": {"application/json": {"schema": {"type": "object", "properties": {}}}}}
+      }
+    },
+    "/api/knowledge/libraries/{library}/proposals/{proposal}/reject": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Reject a proposal without modifying Wiki",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryProposalsProposalReject",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {"name": "library", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "proposal", "in": "path", "required": true, "schema": {"type": "string"}}
+        ],
+        "requestBody": {"required": false, "content": {"application/json": {"schema": {"type": "object", "properties": {}}}}}
+      }
+    },
+    "/api/knowledge/libraries/{library}/config": {
+      "put": {
+        "tags": ["Knowledge"],
+        "summary": "Configure model and local Claw context permissions",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgePutApiKnowledgeLibrariesLibraryConfig",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeConfig"}}}
+        }
+      }
+    },
+    "/api/knowledge/libraries/{library}/export": {
+      "get": {
+        "tags": ["Knowledge"],
+        "summary": "Download a fixed ZIP snapshot of valid published pages",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgeGetApiKnowledgeLibrariesLibraryExport",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/zip": {"schema": {"type": "string", "format": "binary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {"name": "library", "in": "path", "required": true, "schema": {"type": "string"}},
+          {
+            "name": "includeRaw",
+            "in": "query",
+            "required": false,
+            "schema": {"type": "boolean", "default": false},
+            "description": "Include only active raw originals cited by exported pages. Defaults to false."
+          }
+        ]
+      }
+    },
+    "/api/knowledge/libraries/{library}/context": {
+      "get": {
+        "tags": ["Knowledge"],
+        "summary": "Read local agent context when clawRead is enabled",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>].",
+        "operationId": "knowledgeGetApiKnowledgeLibrariesLibraryContext",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeContext"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}]
+      }
+    },
+    "/api/knowledge/libraries/{library}/backup": {
+      "get": {
+        "tags": ["Knowledge"],
+        "summary": "Download a complete canonical backup",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. Contains raw sources, versions, proposals and steward jobs. No connector credentials. 20 MiB maximum canonical content; distinct from public ZIP sharing.",
+        "operationId": "knowledgeGetApiKnowledgeLibrariesLibraryBackup",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeBackup"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}]
+      }
+    },
+    "/api/knowledge/restore": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Restore backup as a new isolated library",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. Never overwrites the original library. Validates checksums, identifiers, source references and revisions. Restored library permissions are off; queued/running jobs are cancelled.",
+        "operationId": "knowledgePostApiKnowledgeRestore",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeLibrary"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {"backup": {"$ref": "#/components/schemas/KnowledgeBackup"}},
+                "required": ["backup"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/knowledge/libraries/{library}/connections": {
+      "get": {
+        "tags": ["Knowledge"],
+        "summary": "List library connection metadata without credentials",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. ",
+        "operationId": "knowledgeGetApiKnowledgeLibrariesLibraryConnections",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "connections": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeConnection"}}
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}]
+      },
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Create an expiring library-scoped bearer credential",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. Token returned once only. Store safely in the client backend. Requires library clawRead, and clawDraft for draft access.",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryConnections",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "connection": {"$ref": "#/components/schemas/KnowledgeConnection"},
+                    "token": {"type": "string"}
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "requestBody": {
+          "required": true,
+          "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeConnectionInput"}}}
+        }
+      }
+    },
+    "/api/knowledge/libraries/{library}/connections/{connection}/revoke": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Revoke a connection and its pending proposal acceptance",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. ",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryConnectionsConnectionRevoke",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"connection": {"$ref": "#/components/schemas/KnowledgeConnection"}}
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {"name": "library", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "connection", "in": "path", "required": true, "schema": {"type": "string"}}
+        ]
+      }
+    },
+    "/api/knowledge/libraries/{library}/steward": {
+      "get": {
+        "tags": ["Knowledge"],
+        "summary": "List persistent steward jobs and deterministic health findings",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. ",
+        "operationId": "knowledgeGetApiKnowledgeLibrariesLibrarySteward",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeStewardState"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}]
+      }
+    },
+    "/api/knowledge/libraries/{library}/steward/jobs": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Queue bounded source compilation for explicit execution",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. ",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryStewardJobs",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeStewardJob"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [{"name": "library", "in": "path", "required": true, "schema": {"type": "string"}}],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {"sourceIds": {"type": "array", "items": {"type": "string"}}},
+                "required": ["sourceIds"]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/knowledge/libraries/{library}/steward/jobs/{job}/run": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Run a steward task",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. No automatic publishing. Run uses selected model/source with a 120-second budget. Model failure is represented by a failed job, not a fabricated answer. Retry limit is three attempts.",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryStewardJobsJobRun",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeStewardResult"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {"name": "library", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "job", "in": "path", "required": true, "schema": {"type": "string"}}
+        ]
+      }
+    },
+    "/api/knowledge/libraries/{library}/steward/jobs/{job}/cancel": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Cancel a steward task",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. No automatic publishing. Run uses selected model/source with a 120-second budget. Model failure is represented by a failed job, not a fabricated answer. Retry limit is three attempts.",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryStewardJobsJobCancel",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeStewardJob"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {"name": "library", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "job", "in": "path", "required": true, "schema": {"type": "string"}}
+        ]
+      }
+    },
+    "/api/knowledge/libraries/{library}/steward/jobs/{job}/retry": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Retry a steward task",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. No automatic publishing. Run uses selected model/source with a 120-second budget. Model failure is represented by a failed job, not a fabricated answer. Retry limit is three attempts.",
+        "operationId": "knowledgePostApiKnowledgeLibrariesLibraryStewardJobsJobRetry",
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {"application/json": {"schema": {"$ref": "#/components/schemas/KnowledgeStewardJob"}}}
+          },
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {"name": "library", "in": "path", "required": true, "schema": {"type": "string"}},
+          {"name": "job", "in": "path", "required": true, "schema": {"type": "string"}}
+        ]
+      }
+    },
+    "/api/knowledge/mcp": {
+      "post": {
+        "tags": ["Knowledge"],
+        "summary": "Stateless Streamable HTTP MCP for scoped Wiki tools",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. Protocol 2025-06-18. initialize, ping, tools/list, tools/call, notifications/initialized. Tools: knowledge_search, knowledge_read, knowledge_propose (only with draft permission). Tools never read raw or publish. Existing pages require baseVersion; task/run/request IDs retain provenance and idempotency. Accept must include application/json and text/event-stream. MCP-Protocol-Version may be sent on subsequent requests.",
+        "operationId": "knowledgePostApiKnowledgeMcp",
+        "responses": {
+          "200": {"description": "Success", "content": {"application/json": {"schema": {"type": "object"}}}},
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "202": {"description": "Notification accepted (no response body)"},
+          "401": {"description": "Missing, invalid, expired or revoked bearer credential"},
+          "406": {"description": "MCP Accept negotiation required"}
+        },
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "jsonrpc": {"const": "2.0"},
+                  "id": {"type": ["string", "number", "null"]},
+                  "method": {"type": "string"},
+                  "params": {"type": "object"}
+                },
+                "required": ["jsonrpc", "method"]
+              }
+            }
+          }
+        },
+        "security": [{"KnowledgeBearer": []}]
+      },
+      "get": {
+        "tags": ["Knowledge"],
+        "summary": "Authenticate then reject standalone SSE stream",
+        "description": "Private loopback management API. Requires loopback peer and Host, same-origin browser requests. Not exposed on the external inference listener. All mutations are library-scoped; originals are immutable. Source citations use [source:<id>]. Stateless transport returns 405 with Allow: POST. No server-initiated SSE stream.",
+        "operationId": "knowledgeGetApiKnowledgeMcp",
+        "responses": {
+          "400": {
+            "description": "Invalid input",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Origin, loopback, or Claw permission denied",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Resource not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Version, source, or state conflict",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Storage operation failed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Knowledge storage unavailable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {"error": {"type": "string"}, "error_code": {"type": "integer"}}
+                }
+              }
+            }
+          },
+          "405": {"description": "No standalone SSE stream"},
+          "401": {"description": "Invalid bearer credential"}
+        },
+        "parameters": [],
+        "security": [{"KnowledgeBearer": []}]
+      }
     }
   },
   "components": {
@@ -9740,7 +12323,8 @@
           },
           "num_parallel": {
             "type": "integer"
-          }
+          },
+          "knowledge": {"$ref": "#/components/schemas/ConversationKnowledgeSelection"}
         }
       },
       "Conversation": {
@@ -10096,7 +12680,8 @@
             "items": {
               "$ref": "#/components/schemas/WebSearchResult"
             }
-          }
+          },
+          "knowledge": {"$ref": "#/components/schemas/MessageKnowledgeSnapshot"}
         }
       },
       "WebSearchOptions": {
@@ -15922,6 +18507,260 @@
             ]
           }
         }
+      },
+      "ConversationKnowledgeSelection": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["library_id"],
+        "properties": {
+          "library_id": {"type": "string"},
+          "page_ids": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Selected page IDs; omitted means all eligible pages in this library."
+          }
+        },
+        "description": "Optional persisted selection for the next conversation turn. Does not grant library access."
+      },
+      "MessageKnowledgeSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["library_id", "library_name", "captured_at", "pages", "sources"],
+        "properties": {
+          "library_id": {"type": "string"},
+          "library_name": {"type": "string"},
+          "captured_at": {"type": "string", "format": "date-time"},
+          "pages": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgePageSnapshot"}},
+          "sources": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeSourceSnapshot"}}
+        },
+        "description": "Historical context provenance captured for this message. Records selected page versions and source hashes; does not assert that the model used every source."
+      },
+      "KnowledgePageSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "version", "source_ids"],
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "version": {"type": "integer"},
+          "source_ids": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "KnowledgeSourceSnapshot": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "title", "sha256"],
+        "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "sha256": {"type": "string"}}
+      },
+      "KnowledgeConfig": {
+        "type": "object",
+        "properties": {
+          "model": {"type": "string"},
+          "modelSource": {"type": "string"},
+          "clawRead": {"type": "boolean"},
+          "clawDraft": {"type": "boolean"}
+        },
+        "required": ["model", "modelSource", "clawRead", "clawDraft"]
+      },
+      "KnowledgeSource": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "filename": {"type": "string"},
+          "content": {"type": "string"},
+          "sha256": {"type": "string"},
+          "status": {"type": "string", "enum": ["active", "withdrawn"]},
+          "created": {"type": "string"}
+        }
+      },
+      "KnowledgeRevision": {
+        "type": "object",
+        "properties": {
+          "version": {"type": "integer"},
+          "title": {"type": "string"},
+          "content": {"type": "string"},
+          "sourceIds": {"type": "array", "items": {"type": "string"}},
+          "updated": {"type": "string"}
+        }
+      },
+      "KnowledgePage": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "content": {"type": "string"},
+          "sourceIds": {"type": "array", "items": {"type": "string"}},
+          "version": {"type": "integer"},
+          "updated": {"type": "string"},
+          "history": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeRevision"}},
+          "stale": {"type": "boolean"}
+        }
+      },
+      "KnowledgeChange": {
+        "type": "object",
+        "properties": {
+          "pageId": {"type": "string"},
+          "title": {"type": "string"},
+          "content": {"type": "string"},
+          "sourceIds": {"type": "array", "items": {"type": "string"}},
+          "baseVersion": {"type": "integer"}
+        },
+        "required": ["title", "content", "sourceIds", "baseVersion"]
+      },
+      "KnowledgeProposal": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "title": {"type": "string"},
+          "kind": {"type": "string", "enum": ["manual", "model", "demo", "claw"]},
+          "status": {"type": "string", "enum": ["pending", "accepted", "rejected"]},
+          "changes": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeChange"}},
+          "created": {"type": "string"},
+          "connector": {"$ref": "#/components/schemas/KnowledgeConnectorProvenance"}
+        }
+      },
+      "KnowledgeLog": {
+        "type": "object",
+        "properties": {"id": {"type": "string"}, "time": {"type": "string"}, "message": {"type": "string"}}
+      },
+      "KnowledgeLibrary": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "description": {"type": "string"},
+          "config": {"$ref": "#/components/schemas/KnowledgeConfig"},
+          "sources": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeSource"}},
+          "pages": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgePage"}},
+          "proposals": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeProposal"}},
+          "logs": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeLog"}},
+          "stewardJobs": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeStewardJob"}}
+        }
+      },
+      "KnowledgeContext": {
+        "type": "object",
+        "properties": {
+          "libraryId": {"type": "string"},
+          "name": {"type": "string"},
+          "pages": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "id": {"type": "string"},
+                "title": {"type": "string"},
+                "content": {"type": "string"},
+                "version": {"type": "integer"},
+                "sourceIds": {"type": "array", "items": {"type": "string"}}
+              }
+            }
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "sha256": {"type": "string"}}
+            }
+          }
+        }
+      },
+      "KnowledgeBackup": {
+        "type": "object",
+        "properties": {
+          "format": {"const": "csglite-knowledge-backup"},
+          "version": {"const": 1},
+          "created": {"type": "string"},
+          "sha256": {"type": "string"},
+          "library": {"$ref": "#/components/schemas/KnowledgeLibrary"}
+        },
+        "required": ["format", "version", "created", "sha256", "library"]
+      },
+      "KnowledgeConnection": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "created": {"type": "string"},
+          "expiresAt": {"type": "string"},
+          "lastUsed": {"type": "string"},
+          "revoked": {"type": "boolean"},
+          "allowDraft": {"type": "boolean"}
+        },
+        "required": ["id", "name", "created", "expiresAt", "revoked", "allowDraft"]
+      },
+      "KnowledgeConnectionInput": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "allowDraft": {"type": "boolean"},
+          "expiresInDays": {"type": "integer", "minimum": 1, "maximum": 365, "default": 30}
+        },
+        "required": ["name"]
+      },
+      "KnowledgeConnectorProvenance": {
+        "type": "object",
+        "properties": {
+          "connectionId": {"type": "string"},
+          "taskId": {"type": "string"},
+          "runId": {"type": "string"},
+          "requestId": {"type": "string"},
+          "requestHash": {"type": "string"},
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {"id": {"type": "string"}, "title": {"type": "string"}, "sha256": {"type": "string"}}
+            }
+          }
+        }
+      },
+      "KnowledgeStewardJob": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "created": {"type": "string"},
+          "updated": {"type": "string"},
+          "model": {"type": "string"},
+          "modelSource": {"type": "string"},
+          "proposalId": {"type": "string"},
+          "error": {"type": "string"},
+          "status": {"type": "string", "enum": ["queued", "running", "completed", "failed", "cancelled"]},
+          "attempts": {"type": "integer", "maximum": 3},
+          "sourceIds": {"type": "array", "items": {"type": "string"}},
+          "sourceSnapshots": {"type": "object", "additionalProperties": {"type": "string"}},
+          "pageVersions": {"type": "object", "additionalProperties": {"type": "integer"}}
+        },
+        "required": ["id", "status", "sourceIds", "created", "updated", "attempts", "model", "modelSource"]
+      },
+      "KnowledgeStewardIssue": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "kind": {"type": "string"},
+          "severity": {"type": "string"},
+          "message": {"type": "string"},
+          "sourceIds": {"type": "array", "items": {"type": "string"}},
+          "pageIds": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "KnowledgeStewardState": {
+        "type": "object",
+        "properties": {
+          "jobs": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeStewardJob"}},
+          "issues": {"type": "array", "items": {"$ref": "#/components/schemas/KnowledgeStewardIssue"}}
+        }
+      },
+      "KnowledgeStewardResult": {
+        "type": "object",
+        "properties": {"job": {"$ref": "#/components/schemas/KnowledgeStewardJob"}, "proposalId": {"type": "string"}}
+      }
+    },
+    "securitySchemes": {
+      "KnowledgeBearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Independent expiring library-scoped connector token; never a model or desktop credential."
       }
     }
   }

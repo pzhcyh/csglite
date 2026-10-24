@@ -1,5 +1,8 @@
 [![engineering momentum](https://signals.gitdealflow.com/api/badge/opencsgs)](https://signals.gitdealflow.com/startup/opencsgs)
 # CSGLite
+
+> **Personal Knowledge development edition** — adds a reviewed LLM Wiki workspace, a memory steward, knowledge-aware chat, scoped CSGClaw MCP access, and backup/restore. Start with the [knowledge guide](docs/knowledge/README.zh-CN.md). This is a development extension of OpenCSG's project, not an official release; the upstream installation commands below install the upstream distribution.
+
 <p align="center">
   <img src="docs/images/system.svg" alt="CSGLite system architecture: clients, API, router, where a request runs, and the model store" width="95%">
 </p>
@@ -40,6 +43,7 @@ by another machine on your network, or by a provider.
 - **Chat Interface** — interactive chat with local and cloud models
 - **AI Apps** — install and launch AI applications with one-click configuration
 - **Settings** — configure storage, third-party providers, and access tokens
+- **Personal Knowledge (development preview)** — an Obsidian-style workspace with immutable text sources, a memory steward, reviewed LLM Wiki proposals, versioned Markdown, backlinks, knowledge-aware chat, scoped CSGClaw MCP tools, ZIP sharing, and full backup/restore. See the [knowledge guide](docs/knowledge/README.zh-CN.md) for setup and current limits.
 
 ### Integrations
 

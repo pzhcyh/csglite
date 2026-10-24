@@ -998,7 +998,21 @@ export interface ChatMessage {
   meta?: ChatMessageMeta;
 }
 
+export interface KnowledgeChatSelection {
+  library_id: string;
+  page_ids?: string[];
+}
+
+export interface KnowledgeChatSnapshot {
+  library_id: string;
+  library_name: string;
+  captured_at: string;
+  pages: { id: string; title: string; version: number; source_ids: string[] }[];
+  sources: { id: string; title: string; sha256: string }[];
+}
+
 export interface ChatMessageMeta {
+  knowledge?: KnowledgeChatSnapshot;
   tokens?: number;
   speed?: number;
   duration_ms?: number;
@@ -2092,6 +2106,7 @@ export interface ConversationMeta {
 }
 
 export interface ConversationSettings {
+  knowledge?: KnowledgeChatSelection;
   num_ctx?: number;
 }
 
